@@ -33,18 +33,16 @@ First launch will ask. Tap allow.
 
 ### 3. Install the shortcut
 
-Two paths:
+Download [`OnTime.shortcut`](OnTime.shortcut) and open it.
 
-**(a) Prebuilt file (recommended).** Download [`OnTime.shortcut`](OnTime.shortcut) from this repo. Then:
+- **macOS:** double-click. Shortcuts.app opens an import sheet → **Add Shortcut**.
+- **iPhone:** AirDrop from your Mac (or download in Files and tap). The Shortcuts app shows the import sheet → **Add Shortcut**.
 
-- **On macOS Sequoia:** double-click the file. Shortcuts opens it for review → **Add Shortcut**.
-- **On iPhone:** AirDrop the file from your Mac to your iPhone. iOS will offer to import. Requires **Settings → Shortcuts → Allow Sharing Untrusted Shortcuts** turned on (which itself requires you to have run at least one shortcut on the device — open Shortcuts.app and run any built-in once, then the toggle appears).
+The file is **signed via Apple's signing service** (`shortcuts sign --mode anyone`), so no "Allow Untrusted Shortcuts" toggle is required.
 
-> The committed `OnTime.shortcut` is generated from `tools/build_shortcut.py`. The Shortcuts plist format is under-documented; if any actions import as **Unknown Action**, swap them in-place — UUIDs and variable wiring are intact.
-
-**(b) iCloud share link** (after the shortcut is published, the in-app **Install Shortcut** button opens this directly): once Ruchir publishes via Shortcuts.app → Share → Copy iCloud Link, the URL is committed to `OnTime/Constants.swift`. Until then, use path (a).
-
-If both paths fail, hand-build using [`Shortcut/BUILD.md`](Shortcut/BUILD.md). ~10 minutes.
+> Need to rebuild from source? Run `python3 tools/build_shortcut.py` on macOS — it regenerates `OnTime.unsigned.shortcut` (XML plist, the human-readable source), then signs it via the system `shortcuts sign` CLI to produce `OnTime.shortcut`.
+>
+> If you'd rather hand-build instead of trusting the generator, the recipe is in [`Shortcut/BUILD.md`](Shortcut/BUILD.md). Takes ~10 minutes.
 
 ### 4. Set up the daily automation
 Tap **Set Up Daily Automation** inside the app — it walks you through six taps in the Shortcuts app to schedule a 12:01 AM trigger. Done once, runs forever.
@@ -66,11 +64,12 @@ on-time/
 │   ├── Services/             # CalendarService, ConfigStore, ShortcutLauncher
 │   ├── Views/                # RootView, ContactView, AutomationGuideView
 │   └── Assets.xcassets/      # AppIcon (1024px clock-face), AccentColor
-├── OnTime.shortcut           # Prebuilt companion shortcut (XML plist, generated)
+├── OnTime.shortcut           # Signed companion shortcut (AEA, ready to import)
+├── OnTime.unsigned.shortcut  # XML plist source (input to `shortcuts sign`)
 ├── Shortcut/
 │   └── BUILD.md              # Hand-build recipe (fallback / reference)
 ├── tools/
-│   └── build_shortcut.py     # Generator for OnTime.shortcut
+│   └── build_shortcut.py     # Generator: emits unsigned plist + signs via `shortcuts sign`
 ├── docs/
 │   ├── setup-guide.md        # End-user setup walkthrough
 │   └── app-store-submission.md

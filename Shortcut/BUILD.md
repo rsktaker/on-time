@@ -1,10 +1,10 @@
 # Building the On Time shortcut
 
-> **First, prefer the prebuilt:** [`OnTime.shortcut`](../OnTime.shortcut) at the
-> repo root is a generated plist. Double-click it on macOS or AirDrop it to
-> your iPhone (with **Settings → Shortcuts → Allow Sharing Untrusted
-> Shortcuts** enabled) and Shortcuts will offer to import it. Use this file
-> if you don't want to hand-build.
+> **First, prefer the prebuilt:** [`OnTime.shortcut`](../OnTime.shortcut) at
+> the repo root is generated and **signed** via Apple's signing service
+> (`shortcuts sign --mode anyone`). Double-click on macOS or AirDrop to
+> iPhone — no Untrusted Shortcuts toggle required. Use this file unless
+> you want to hand-build.
 >
 > Hand-building is documented below as a fallback / reference.
 

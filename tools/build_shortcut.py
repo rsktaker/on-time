@@ -355,9 +355,30 @@ shortcut: dict[str, Any] = {
 }
 
 repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-out_path = os.path.join(repo_root, "OnTime.shortcut")
-with open(out_path, "wb") as f:
+# The `shortcuts sign` CLI requires the input to have a .shortcut extension.
+unsigned_path = os.path.join(repo_root, "OnTime.unsigned.shortcut")
+signed_path = os.path.join(repo_root, "OnTime.shortcut")
+
+with open(unsigned_path, "wb") as f:
     plistlib.dump(shortcut, f, fmt=plistlib.FMT_XML)
 
-print(f"wrote {out_path}")
+print(f"wrote {unsigned_path}")
 print(f"  actions: {len(actions)}")
+
+# Sign via Apple's signing service (`shortcuts sign` ships with macOS 12+).
+# Requires this script to run on a Mac signed in to iCloud. --mode anyone
+# means the resulting .shortcut file imports for any user, not just contacts.
+import subprocess
+result = subprocess.run(
+    ["shortcuts", "sign", "--mode", "anyone",
+     "--input", unsigned_path, "--output", signed_path],
+    capture_output=True, text=True,
+)
+# `shortcuts sign` prints harmless "Unrecognized attribute string flag" lines
+# to stderr even on success — only treat a non-zero exit as failure.
+if result.returncode != 0:
+    print(result.stdout)
+    print(result.stderr)
+    raise SystemExit(f"shortcuts sign failed (exit {result.returncode})")
+
+print(f"signed → {signed_path}")
