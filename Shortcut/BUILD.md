@@ -8,6 +8,7 @@ README.
 
 > **Time to build:** ~10 minutes on iPhone.
 > **Tested with:** Shortcuts app on iOS 17 / 18.
+> **On macOS Shortcuts:** the same actions and settings exist. Translate "tap" → "click", "long-press" → "right-click", and "tap **(i)** at the bottom" → "click the **info** icon in the toolbar → **Details**".
 
 ---
 
@@ -87,13 +88,13 @@ Open the Shortcuts app → tap **+** → name the shortcut **`On Time`** (this e
 | 35 |   **End If** | |
 | 36 | **End Repeat** | |
 
-> **Step 28 tip:** When picking variables for the inner `If`, tap each `Repeat Item` chip and choose the right one — the inner `Repeat Item` is the calendar **name** (a string), and you want to compare it to the outer event's `Calendar` property (also a string). If the chips look identical, long-press to rename the outer Repeat Item to `Event` and the inner to `ExclName` so they're distinguishable.
+> **Step 28 tip:** Inside a nested Repeat, Shortcuts shows the chips as **Repeat Item 1** and **Repeat Item 2**. Which number maps to outer vs. inner is wording-ambiguous in Apple's own docs — tap each chip to see which loop it came from. You want the comparison to be: *(inner) Repeat Item* (a calendar **name** from `Excluded`) **is** *(outer) Repeat Item → Calendar* (the event's calendar name). If you get them swapped, the test still type-checks string-vs-string but won't actually filter; verify with one test run.
 
 ---
 
 ## Final settings on the shortcut
 
-Tap the **(i)** icon at the bottom of the shortcut and:
+Open the shortcut's settings panel — on iPhone tap the **(i)** at the bottom; on Mac click the **info** icon in the toolbar → **Details** — and:
 
 - **Show in Share Sheet:** off
 - **Show on Apple Watch:** off (unless you want it)
