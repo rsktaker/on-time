@@ -2,7 +2,7 @@
 
 > Never be late again. iOS app that creates a phone alarm a few minutes before every calendar event you actually care about.
 
-**On Time** turns your iPhone's calendar into a wall of alarms. Every morning at 12:01 AM, it deletes yesterday's alarms and sets fresh ones — one for each event today, ringing N minutes before the event starts. You pick the buffer. You pick the calendars.
+**On Time** turns your iPhone's calendar into a wall of alarms. Every morning at 12:01 AM, it deletes yesterday's alarms and sets fresh ones — one for each event today, ringing N minutes before the event starts. You pick the buffer and which calendars.
 
 It's the fix for the gap between "calendar reminder you swipe past" and "alarm you can't ignore".
 
@@ -32,9 +32,19 @@ Available on the App Store soon. Until then, [build it from source](#build-from-
 First launch will ask. Tap allow.
 
 ### 3. Install the shortcut
-Tap **Install Shortcut** inside the app — this opens the iCloud share link. Tap **Add Shortcut**.
 
-> The iCloud link is set after the shortcut is published. If you're an early reader and the link still points to this README, build the shortcut yourself by following [`Shortcut/BUILD.md`](Shortcut/BUILD.md). Takes about 10 minutes.
+Two paths:
+
+**(a) Prebuilt file (recommended).** Download [`OnTime.shortcut`](OnTime.shortcut) from this repo. Then:
+
+- **On macOS Sequoia:** double-click the file. Shortcuts opens it for review → **Add Shortcut**.
+- **On iPhone:** AirDrop the file from your Mac to your iPhone. iOS will offer to import. Requires **Settings → Shortcuts → Allow Sharing Untrusted Shortcuts** turned on (which itself requires you to have run at least one shortcut on the device — open Shortcuts.app and run any built-in once, then the toggle appears).
+
+> The committed `OnTime.shortcut` is generated from `tools/build_shortcut.py`. The Shortcuts plist format is under-documented; if any actions import as **Unknown Action**, swap them in-place — UUIDs and variable wiring are intact.
+
+**(b) iCloud share link** (after the shortcut is published, the in-app **Install Shortcut** button opens this directly): once Ruchir publishes via Shortcuts.app → Share → Copy iCloud Link, the URL is committed to `OnTime/Constants.swift`. Until then, use path (a).
+
+If both paths fail, hand-build using [`Shortcut/BUILD.md`](Shortcut/BUILD.md). ~10 minutes.
 
 ### 4. Set up the daily automation
 Tap **Set Up Daily Automation** inside the app — it walks you through six taps in the Shortcuts app to schedule a 12:01 AM trigger. Done once, runs forever.
@@ -56,8 +66,11 @@ on-time/
 │   ├── Services/             # CalendarService, ConfigStore, ShortcutLauncher
 │   ├── Views/                # RootView, ContactView, AutomationGuideView
 │   └── Assets.xcassets/      # AppIcon (1024px clock-face), AccentColor
+├── OnTime.shortcut           # Prebuilt companion shortcut (XML plist, generated)
 ├── Shortcut/
-│   └── BUILD.md              # Recipe to build the companion shortcut
+│   └── BUILD.md              # Hand-build recipe (fallback / reference)
+├── tools/
+│   └── build_shortcut.py     # Generator for OnTime.shortcut
 ├── docs/
 │   ├── setup-guide.md        # End-user setup walkthrough
 │   └── app-store-submission.md

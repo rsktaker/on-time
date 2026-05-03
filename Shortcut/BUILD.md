@@ -1,14 +1,26 @@
 # Building the On Time shortcut
 
+> **First, prefer the prebuilt:** [`OnTime.shortcut`](../OnTime.shortcut) at the
+> repo root is a generated plist. Double-click it on macOS or AirDrop it to
+> your iPhone (with **Settings → Shortcuts → Allow Sharing Untrusted
+> Shortcuts** enabled) and Shortcuts will offer to import it. Use this file
+> if you don't want to hand-build.
+>
+> Hand-building is documented below as a fallback / reference.
+
+---
+
 The iOS app has a settings UI but it cannot create alarms — that capability
 is locked to the Shortcuts app. This file is the recipe to build the
-companion shortcut **once** on your iPhone, share it via iCloud, and paste
-the share URL into `OnTime/Constants.swift` (`shortcutInstallURL`) and the
-README.
+companion shortcut **once** on your phone or Mac, share it via iCloud, and
+paste the share URL into `OnTime/Constants.swift` (`shortcutInstallURL`) and
+the README.
 
 > **Time to build:** ~10 minutes on iPhone.
 > **Tested with:** Shortcuts app on iOS 17 / 18.
-> **On macOS Shortcuts:** the same actions and settings exist. Translate "tap" → "click", "long-press" → "right-click", and "tap **(i)** at the bottom" → "click the **info** icon in the toolbar → **Details**".
+> **On macOS Shortcuts (Sequoia):** the same actions and settings exist. Translate "tap" → "click", "long-press" → "right-click", and "tap **(i)** at the bottom" → "click the **info** icon in the toolbar → **Details**".
+>
+> **Important Shortcuts gotcha used throughout:** the **Set Variable** action does *not* accept literal numbers or strings directly — it only takes the output of the previous action ("magic variable"). To assign a literal (e.g. `Skip = 0`), insert a **Number** or **Text** action first that produces the value, then point Set Variable at that action's output.
 
 ---
 
@@ -76,19 +88,21 @@ Open the Shortcuts app → tap **+** → name the shortcut **`On Time`** (this e
 | - | ------ | ------------- |
 | 24 | **Find All Calendar Events where** | Filter 1: **Start Date** is **today**. Filter 2: **Is Not All Day**. (Match **All** of the following.) Sort by: None. Limit: off. |
 | 25 | **Repeat with Each** | Source: **Calendar Events** (output of step 24). |
-| 26 |   **Set Variable** | Name: `Skip`. Value: **0** (text). |
-| 27 |   **Repeat with Each** | Source: variable `Excluded`. |
-| 28 |     **If** | If **Repeat Item** (inner) **is** **Repeat Item** *(outer — tap "Repeat Item" and choose the calendar event's **Calendar** property)*. |
-| 29 |       **Set Variable** | Name: `Skip`. Value: **1**. |
-| 30 |     **End If** | |
-| 31 |   **End Repeat** | |
-| 32 |   **If** | If `Skip` **is** **0**. |
-| 33 |     **Adjust Date** | Date: outer **Repeat Item**. Subtract `Buffer` **Minutes**. Output is **Adjusted Date**. |
-| 34 |     **Create Alarm** | Alarm time: **Adjusted Date**. Label: outer **Repeat Item**'s **Title**. *(Tap "Show More" if you want to set sound or repeating off.)* |
-| 35 |   **End If** | |
-| 36 | **End Repeat** | |
+| 26 |   **Number** | Value: **0**. (Required so Set Variable in the next step has a magic variable to assign.) |
+| 27 |   **Set Variable** | Name: `Skip`. Value: **Number** (output of step 26). |
+| 28 |   **Repeat with Each** | Source: variable `Excluded`. |
+| 29 |     **If** | If **Repeat Item** (inner) **is** **Repeat Item** *(outer — tap "Repeat Item" and choose the calendar event's **Calendar** property)*. |
+| 30 |       **Number** | Value: **1**. |
+| 31 |       **Set Variable** | Name: `Skip`. Value: **Number** (output of step 30). |
+| 32 |     **End If** | |
+| 33 |   **End Repeat** | |
+| 34 |   **If** | If `Skip` **is** **0**. |
+| 35 |     **Adjust Date** | Date: outer **Repeat Item**. Subtract `Buffer` **Minutes**. Output is **Adjusted Date**. |
+| 36 |     **Create Alarm** | Alarm time: **Adjusted Date**. Label: outer **Repeat Item**'s **Title**. *(Tap "Show More" if you want to set sound or repeating off.)* |
+| 37 |   **End If** | |
+| 38 | **End Repeat** | |
 
-> **Step 28 tip:** Inside a nested Repeat, Shortcuts shows the chips as **Repeat Item 1** and **Repeat Item 2**. Which number maps to outer vs. inner is wording-ambiguous in Apple's own docs — tap each chip to see which loop it came from. You want the comparison to be: *(inner) Repeat Item* (a calendar **name** from `Excluded`) **is** *(outer) Repeat Item → Calendar* (the event's calendar name). If you get them swapped, the test still type-checks string-vs-string but won't actually filter; verify with one test run.
+> **Step 29 tip:** Inside a nested Repeat, Shortcuts shows the chips as **Repeat Item 1** and **Repeat Item 2**. Which number maps to outer vs. inner is wording-ambiguous in Apple's own docs — tap each chip to see which loop it came from. You want the comparison to be: *(inner) Repeat Item* (a calendar **name** from `Excluded`) **is** *(outer) Repeat Item → Calendar* (the event's calendar name). If you get them swapped, the test still type-checks string-vs-string but won't actually filter; verify with one test run.
 
 ---
 
